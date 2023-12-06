@@ -32,15 +32,12 @@ const ClientBenefit:React.FC<ClientBenefitProps> = ({
          return result
     }
 
-    const mergeArr:any[] = [];
+    const mergeArr = useMemo(() => {
+    const tempArr:any[] = [];
     for(let i=0;i<reservation.length;i++)
     {
-        //console.log(reservation[i].listingId)
-        //console.log(checkExist(reservation[i].listingId))
         if(checkExist(reservation[i].listingId)){
-            //console.log(mergeArr)
-          let result = mergeArr.find((item) =>item.id === reservation[i-1].id);
-          //console.log(result);
+          let result = tempArr.find((item) =>item.id === reservation[i-1].id);
           if(result){
             result.count +=1;
             result.totalPrice +=reservation[i].totalPrice;
@@ -48,17 +45,18 @@ const ClientBenefit:React.FC<ClientBenefitProps> = ({
           
         }else{
             let updateArr = {...reservation[i], count:1}
-            mergeArr.push(updateArr)
+            tempArr.push(updateArr)
         }
     }
-    //console.log(mergeArr)
-    // all benefit
-    const allBenefit = useMemo(()=>{
-       const result =  mergeArr.reduce((cal, item)=>{
-            return cal +=item.totalPrice
-        },0);
-        return result
-    },[mergeArr])
+    return tempArr;
+}, [reservation]);
+
+const allBenefit = useMemo(()=>{
+   const result =  mergeArr.reduce((cal, item)=>{
+        return cal +=item.totalPrice
+    },0);
+    return result
+},[mergeArr])
 
     // show mounth
     const takeMounth = useMemo(()=>{
